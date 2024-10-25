@@ -51,13 +51,25 @@ namespace TimeTweaker
 
         private void UpdateFolderTimes(string folderPath)
         {
-            // 獲取該資料夾內的所有檔案
+            // 先修改資料夾本身的時間屬性
+            try
+            {
+                Directory.SetCreationTime(folderPath, dateTimePicker1.Value);
+                Directory.SetLastWriteTime(folderPath, dateTimePicker1.Value);
+                Directory.SetLastAccessTime(folderPath, dateTimePicker1.Value);
+            }
+            catch (Exception ex)
+            {
+                // 顯示錯誤但不停止迴圈
+                MessageBox.Show($"修改資料夾時間時發生錯誤：{folderPath}\n錯誤訊息：{ex.Message}");
+            }
+
+            // 獲取該資料夾內的所有檔案並修改時間屬性
             string[] files = Directory.GetFiles(folderPath);
             foreach (var file in files)
             {
                 try
                 {
-                    // 修改每個檔案的時間屬性
                     File.SetCreationTime(file, dateTimePicker1.Value);
                     File.SetLastWriteTime(file, dateTimePicker1.Value);
                     File.SetLastAccessTime(file, dateTimePicker1.Value);
@@ -69,7 +81,7 @@ namespace TimeTweaker
                 }
             }
 
-            // 獲取該資料夾內的所有子資料夾
+            // 獲取該資料夾內的所有子資料夾並遞迴處理
             string[] subFolders = Directory.GetDirectories(folderPath);
             foreach (var subFolder in subFolders)
             {
@@ -77,5 +89,6 @@ namespace TimeTweaker
                 UpdateFolderTimes(subFolder);
             }
         }
+
     }
 }
